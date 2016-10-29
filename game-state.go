@@ -34,12 +34,20 @@ type PlayerCounts struct {
   diags [2]int
 }
 
+/**
+ * The result of a game move, one of:
+ * - OWin - Player with piece O has won the game.
+ * - XWin - Player with piece X has won the game.
+ * - Tie  - Board is filled, no winner.
+ * - Pending - Board is not full and no winner, keep playing.
+ */
 type GameResult int
 const GameResult {
   OWin = iota
   XWin = iota
   Tie = iota
   Pending = iota
+}
 
 type GameState struct {
   // The boardSize * boardSize game board, each cell containing a piece 
@@ -56,6 +64,7 @@ type GameState struct {
   xCounts PlayerCounts
   totalPieces int
 }
+
 /**
  * Map of currently ongoing games, keyed by 'userA$$userB', where userA is 
  * lexicographically smaller than userB.
@@ -153,6 +162,11 @@ func checkGameOver(game *GameState, x int, y int) GameResult {
   return Pending
 }
 
+/**
+ * Makes a move by placing a piece on position (x,y) on the board if valid.
+ * Returns the game result - either pending (game is not over), O or X has won, 
+ * or the game is a tie.
+ */
 func makeMove(game *GameState, user string, x int, y int) (err, GameResult) {
   board := game.board
 
@@ -201,6 +215,7 @@ func makeMove(game *GameState, user string, x int, y int) (err, GameResult) {
     game.currentPiece = O
   }
 
+  // Now it's nextPlayer's turn, so we swap currentPlayer and nextPlayer.
   game.currentPlayer = game.nextPlayer
   game.nextPlayer = user
 
